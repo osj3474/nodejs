@@ -1,0 +1,32 @@
+{
+  "name": "nodejs",
+  "version": "1.0.0",
+  "description": "필기노트를 참고해 주세요~!",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --exec babel-node init.js --delay 2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/osj3474/nodejs.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/osj3474/nodejs/issues"
+  },
+  "homepage": "https://github.com/osj3474/nodejs#readme",
+  "dependencies": {
+    "@babel/core": "^7.10.5",
+    "@babel/node": "^7.10.5",
+    "@babel/preset-env": "^7.10.4",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.5",
+    "express": "^4.17.1",
+    "helmet": "^3.23.3",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
