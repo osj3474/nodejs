@@ -84,7 +84,7 @@ app.listen(port, () =>
 ```shell
 npm install @babel/node
 npm install @babel/preset-env
-npm install @bable/core
+npm install @babel/core
 ```
 
 그리고, .babelrc를 만들고, 다음을 입력합니다.
@@ -153,7 +153,9 @@ import morgan from "morgan";
 import helmet from "helmet";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
-// import { userRouter } from "./route";
+// import { userRouter } from "./router";
+
+app = express();
 
 app.use(cookieParser());
 app.use(bodyParser.json());
