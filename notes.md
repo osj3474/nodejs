@@ -155,7 +155,7 @@ import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 // import { userRouter } from "./router";
 
-app = express();
+const app = express();
 
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -213,7 +213,7 @@ middleware은 사용자와 마지막 응답 사이에 존재하는 것입니다.
 
 ## 번외
 
-여기에 정리하기 위해서, 아나콘다 가상환경을 유용하게 사용하였습니다. 아나콘다가 설치되어 있다면, 참고하면 좋을 것 같습니다.
+아나콘다 가상환경을 유용하게 사용하였습니다. 아나콘다가 설치되어 있다면, 참고하면 좋을 것 같습니다.
 
 ```shell
 conda create -n environment_name_you_want python=3.6
