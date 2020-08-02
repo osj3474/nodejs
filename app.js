@@ -3,17 +3,25 @@ import morgan from "morgan";
 import helmet from "helmet";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
-import { userRouter } from "./router";
+import globalRouter from "./routers/globalRouter";
+import userRouter from "./routers/userRouter";
+import videoRouter from "./routers/videoRouter";
+import routes from "./routes";
+import { localMiddleware } from "./middleware";
 
 const app = express();
 
+app.set("view engine", "pug");
+app.use(helmet());
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(helmet());
 app.use(morgan("dev"));
 
-// // get methods something (not listen method here)
-app.use("/user", userRouter); // 사용자가 '/'에 접근하면, userRouter가 이를 처리할 것이라는 의미
+app.use(localMiddleware);
 
-export default app; // 다른 파일에서 import하면, app object를 준다는 의미
+app.use(routes.home, globalRouter); // routes.home = "/"
+app.use(routes.users, userRouter); // routes.users = "/users"
+app.use(routes.videos, videoRouter); // routes.videos = "/videos"
+
+export default app;
