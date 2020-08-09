@@ -26,6 +26,7 @@ const routes = {
   search: SEARCH,
   users: USERS,
   userDetail: (id) => {
+    // get 처리해줄 때, url을 : 를 사용해서 변수로 사용해두면, 항상 이렇게 받아서 처리하는 부분이 있어야 한다.
     if (id) {
       return `/users/${id}`;
     } else {
@@ -43,8 +44,20 @@ const routes = {
       return VIDEOS_DETAILS;
     }
   },
-  editVideo: EDIT_VIDEO,
-  deleteVideo: DELETE_VIDEO,
+  editVideo: (id) => {
+    if (id) {
+      return `/videos/${id}/edit`;
+    } else {
+      return EDIT_VIDEO;
+    }
+  },
+  deleteVideo: (id) => {
+    if (id) {
+      return `/videos/${id}/delete`;
+    } else {
+      return DELETE_VIDEO;
+    }
+  },
 };
 
 export default routes;

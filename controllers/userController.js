@@ -34,7 +34,6 @@ export const logout = (req, res) => {
 // UserRouter
 export const users = (req, res) => res.render("users", { pageTitle: "Users" });
 export const userDetail = (req, res) => {
-  console.log("here?");
   res.render("userDetail", { pageTitle: "UserDetail" });
 };
 export const editProfile = (req, res) =>

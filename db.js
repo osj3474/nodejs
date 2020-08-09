@@ -1,41 +1,17 @@
-export const videos = [
-  {
-    id: 324393,
-    title: "Video awesome",
-    description: "This is something I love",
-    views: 24,
-    videoFile:
-      "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
-    creator: {
-      id: 121212,
-      name: "suhyun",
-      email: "test@test.com",
-    },
-  },
-  {
-    id: 4189414,
-    title: "Video test2",
-    description: "This is something I love",
-    views: 1,
-    videoFile:
-      "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
-    creator: {
-      id: 121212,
-      name: "suhyun",
-      email: "test@test.com",
-    },
-  },
-  {
-    id: 23145,
-    title: "Video awesome last",
-    description: "This is something I love",
-    views: 24,
-    videoFile:
-      "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
-    creator: {
-      id: 121212,
-      name: "suhyun",
-      email: "test@test.com",
-    },
-  },
-];
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+dotenv.config(); // .env에 있는 변수들을 process.env 라는 객체로 불러옵니다.
+
+mongoose.connect(process.env.MONGO_URL, {
+  useNewUrlParser: true,
+  useFindAndModify: false,
+});
+
+const db = mongoose.connection;
+
+const handleOpen = () => console.log("✅ Connected to DB");
+const handleError = (error) =>
+  console.log(`❌ Error on DB Connection:${error}`);
+
+db.once("open", handleOpen);
+db.on("error", handleError);

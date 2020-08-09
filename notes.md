@@ -8,13 +8,13 @@
 
 Spring, Laravel, Django 등 웹 프레임워크는 많은데, nodejs를 사용하는 이유는 무엇일까요?
 
-모든 프레임워크에 장당점이 있기 때문에, 이럴 다음과 같은 경우에 nodejs를 사용합니다.
+모든 프레임워크에 장당점이 있기 때문에, 다음과 같은 경우에 nodejs를 사용합니다.
 
-#### 1. 가장 먼저는 언어가 자바스크립트입니다. 자바스크립트로 프론트엔드, 백엔드를 모두 할 수 있으며, 요소들을 customizing할 수 있게 됩니다.
+#### 1. 자바스크립트를 선택합니다. 자바스크립트로 프론트엔드, 백엔드를 모두 할 수 있으며, 그로 인해 요소들을 customizing할 수 있게 됩니다.
 
 #### 2. 비동기이기 때문에 실시간 처리에 유용합니다. 많은 데이터를 전송하고 저장하고, 알림이나 채팅처럼 실시간 요청에 대한 반응이 필요한 서비스에 유용합니다.
 
-#### cf) 단, 메모리나 램에 접근해서 해야하는 작업에는 적합하지 않습니다. 하지만, 규모가 있는 서비스는 아주 다양한 언어로 개발되어 있습니다. nodejs를 공부한다고 다른 건 못한다고 생각할 필요는 없다고 생각합니다.
+#### cf) 단, 메모리나 램에 접근해서 해야하는 작업에는 적합하지 않습니다. 하지만 어떤 언어를 선택하든, 규모가 있는 서비스는 아주 다양한 언어로 개발되어 있습니다. nodejs를 공부한다고 다른 건 못한다고 생각할 필요는 없다고 생각합니다.
 
 ## Get started
 
@@ -74,7 +74,7 @@ app.listen(port, () =>
 
 #### 0. 파일 만들기
 
-가장 기본적인 예시를 위한 형식으로, 꼭 따를 필요 없이 기본 틀을 이해했다면, 커스터마이징해서 사용하면 됩니다.
+가장 기본적인 파일들이며 꼭 따를 필요 없습니다. 본인에 따라 커스터마이징해서 사용하면 됩니다.
 **app.js** , **init.js** , **router.js** 를 만듭니다.
 
 #### 1. babel
@@ -137,7 +137,7 @@ npm install body-parser
 
 #### 6. cookie-parser
 
-session을 다루기 위해서 cookie에 유저 정보를 저장하는데, 서버가 사용자로부터 받은 데이터를 이해할 수 있게 합니다. json으로 보내는 경우(json), html form으로 보내는 경우(urlencoded)에 대해 설정합니다.
+session을 다루기 위해서 cookie에 유저 정보를 저장하는데, 서버가 사용자로부터 받은 데이터를 이해할 수 있게 합니다. app.use할 때, json으로 보내는 경우(json), html form으로 보내는 경우(urlencoded)에 대해 설정합니다.
 
 ```shell
 npm install cookie-parser
@@ -191,9 +191,13 @@ userRouter.get("/", (req, res) => res.send("Test"));
 
 #### 8. settings finished
 
+```shell
+npm start
+```
+
 ## 명령어 이해
 
-**_모든 명령어는 위에서 아래로 실행됩니다. 이것은 당연하게 보이지만, 생각보다 중요합니다._**
+**_자바 스크립트의 모든 명령어는 위에서 아래로 실행됩니다. 이것은 당연하게 보이지만, 생각보다 중요합니다._**
 
 #### 1. get
 
@@ -203,7 +207,7 @@ get방식은 사용자가 form에 쓴 값이 url에 담겨 있는 것이 특징�
 app.get("/", call); // 사용자가 /에 접근하면, call함수 실행
 ```
 
-_cf) call함수에 res.send("") 가 없으면 무한 로딩_
+_cf) call함수에 res.send() 가 없으면 무한 로딩_
 
 #### 2. use
 
@@ -225,7 +229,7 @@ Model은 데이터,
 View는 데이터가 생긴 모습,
 Controller는 데이터를 찾는 함수입니다. (대게 각 모델마다 컨트롤러가 있습니다.)
 
-_cf) "/user/:id" 에서 ':' 를 붙이면, 어떤 값이든 될 수 있음을 의미합니다._
+_cf) "/user/:id" 에서 ':' 를 붙이면, 어떤 값이든 될 수 있는 변수 임을 의미합니다._
 
 _cf) arrow function : =>를 사용하면 implicit하게 return을 가지고 있어서 return을 붙이지 않습니다. 만약 {}를 사용한다면, return을 붙여야 합니다._
 
@@ -235,14 +239,14 @@ _cf) arrow function : =>를 사용하면 implicit하게 return을 가지고 있�
 
 ```javascript
 export const home = (req, res) =>
-  res.render("템플릿", { something: "넘겨줄 객체" });
+  res.render("pug파일", { something: "넘겨줄 객체" });
 ```
 
-_cf) 위에서 템플릿은 home.pug를 말하며, 넘겨줄 객체는 _
+_cf) 위에서 pug파일에는 원래 view할 파일을 적는 곳으로, 저희는 pug를 view engine으로 설정할 것입니다._
 
 ### 2. View
 
-기본적으로 view의 템플릿은 함수당 하나를 가진다고 생각하면 됩니다. View를 위해서는 먼저 어떤 view engine를 쓸 것인지 정해야합니다. 저의 첫 view engine은 Ejs였지만, pug를 사용해 봅시다.
+기본적으로 view를 할 파일은 Controller에서 정의된 함수당 하나를 가진다고 생각하면 됩니다. View를 위해서는 먼저 어떤 view engine를 쓸 것인지 정해야합니다. 저의 첫 view engine은 Ejs였지만, pug를 사용해 봅시다.
 
 ```shell
 npm install pug
@@ -250,11 +254,13 @@ npm install pug
 
 먼저 pug를 설치한 후에, 명시적으로 view engine을 설정해줘야(app.set) 합니다.
 
+**app.js**
+
 ```javascript
 app.set("view engine", "pug");
 ```
 
-또한, pug파일은 기본적으로 views 폴더 밑에 넣어둬야 합니다. express 공식 API문서에 가보면, views폴더 밑에 담으라고 합니다. 그러면, res.render로 인자를 넘겨줄 때, pug를 붙이지 않아도 views 폴더에서 알아서 찾아서 인식합니다.
+또한, pug파일들은 기본적으로 views 폴더 밑에 넣어둬야 합니다. express 공식 API문서에 가보면, views폴더 밑에 파일들을 담을 것을 설명하고 있습니다. 그러면, res.render로 인자를 넘겨줄 때, pug 확장자를 붙이지 않아도 views 폴더에서 알아서 찾아서 인식합니다. 예를 들면, 다음과 같습니다.
 
 **Controller.js**
 
@@ -262,17 +268,21 @@ app.set("view engine", "pug");
 export const home = (req, res) => res.render("home");
 ```
 
-view에서 중요한 것은 레이아웃을 짜서 사용한다는 것입니다. 가령, header, nav, footer의 경우, 웹사이트 내에서 계속적으로 필요한 것입니다. 그런데, 프로그래밍 언어가 아닌 html로는 모든 파일에 사용하려면, 모든 파일에 해당 부분을 복붙할 수 밖에 없습니다. 이 같은 반복을 막자는 것입니다.
+_cf) view에서 중요한 것은 레이아웃을 짜서 사용한다는 것입니다. 가령, header, nav, footer의 경우, 웹사이트 내에서 계속적으로 필요한 것입니다. 그런데, 프로그래밍 언어가 아닌 html로는 모든 파일에 사용하려면, 모든 파일에 해당 부분을 복붙할 수 밖에 없습니다. 이 같은 반복을 막자는 것입니다._
 
 ## pug와 친해지기
 
-pug는 tab으로 구분함을 명심해야 합니다.
+pug는 <></> 조합이 아닌, **_tab_** 으로 구분함을 명심해야 합니다.
 
 ### 1. 아이콘 사용하기
+
+**html**
 
 ```html
 <i class="fab fa-youtube"></i>
 ```
+
+**pug**
 
 ```pug
 i.fab.fa-youtube
@@ -280,11 +290,15 @@ i.fab.fa-youtube
 
 ### 2. div 사용하기
 
+**html**
+
 ```html
 <div class="title">
   <p>Hello world!</p>
 </div>
 ```
+
+**pug**
 
 ```pug
 .title
@@ -293,9 +307,13 @@ i.fab.fa-youtube
 
 ### 3. span 사용하기
 
+**html**
+
 ```html
 <span class="title"> Hello world! </span>
 ```
+
+**pug**
 
 ```pug
 span.title
@@ -304,11 +322,15 @@ span.title
 
 ### 4. form 사용하기
 
+**html**
+
 ```html
 <form action="" method="get" class="search">
   <input type="text" placeholder="Search by" name="term"></input>
 </form>
 ```
+
+**pug**
 
 ```pug
 .search
@@ -317,6 +339,8 @@ span.title
 ```
 
 ### 5. 자바스크립트 사용하기 (#으로 사용할 수 있습니다.)
+
+**html**
 
 ```html
 <body>
@@ -330,6 +354,8 @@ span.title
 </body>
 ```
 
+**pug**
+
 ```pug
 body
   h1 Test
@@ -337,7 +363,7 @@ body
     #{new Date().getFullYear()}
 ```
 
-### 6. 다른 파일에서 레이아웃(main.pug)을 사용하고자 할 때, extends를 하면 됩니다.
+### 6. 다른 파일(home.pug)에서 레이아웃(main.pug)을 사용하고자 할 때, extends를 하면 됩니다.
 
 **main.pug**
 
@@ -364,7 +390,7 @@ block content
   p Hello
 ```
 
-### 7. 다른 파일에서 element(footer.pug)를 사용하고자 할 때, include를 하면 됩니다.
+### 7. 다른 파일(main.pug)에서 element(footer.pug)를 사용하고자 할 때, include를 하면 됩니다.
 
 **footer.pug**
 
@@ -397,7 +423,7 @@ html
 
 ### 활용 예시
 
-mixin은 pug의 함수의 일종이라서 ()를 붙여서 사용하게 됩니다. 그리고 인자를 받을 수 있도록 해서 사용하게 되는데, 다음의 예시를 보겠습니다.
+mixin은 pug의 함수의 일종이라서 ()를 붙여서 사용하게 됩니다. 그리고 하나의 빈 객체를 인자로 사용합니다. 다음의 예시는 home.pug에서 mixin함수를 사용하는 예시입니다.
 
 **home.pug**
 
@@ -408,23 +434,26 @@ include mixins/videoBlock
 block content
   .videos
     each video in videos
-      +videoBlock({
+      +videoBlock({   // 여기
         title: video.title,
         description: video.description
       })
 ```
 
-home.pug에서 **_+videoBlock해서 _** 객체 안에 내용만 전달해주면, html 형식은 mixins 폴더에 있는 videoBlock.pug에서 틀을 사용하게 되는 것입니다.
+home.pug에서 **_+videoBlock_** 해서 객체 안에 내용만 전달해주면, html 형식은 mixins 폴더에 있는 videoBlock.pug에서 정의한 틀을 사용하게 되는 것입니다.
 
 **videoBlock.pug**
 
 ```pug
+// videoBlock은 mixin의 이름이고, mixin이 함수라서 ()가 있으며, 하나의 인자를 빈 객체형태로 넘겨준다.
 mixin videoBlock(video={})
     h1=video.title
     p=video.description
 ```
 
-_cf) 만약 영상을 사이트에 접속해서 바로 보도록 하고 싶으면, autoplay=true나 controls=true를 해주면 됩니다._
+mixin 안에서 사용하는 video.something 는 mixin을 호출하는 pug파일(home.pug)에서 인자로 넘겨줘야 되고, 그곳에서 key로 정의한 변수명을 사용하는 것입니다. 만약, home.pug에서 videoFile:fileUrl 을 videoBlock.pug에 넘겨주면, videoBlock.pug는 video.videoFile로 사용하는 것이라는 것입니다.
+
+_cf) controls=true를 해주어야 실행 버튼을 누를 수 있게 됩니다._
 
 _cf) 페이지에 상태코드 전달하기_
 
@@ -434,7 +463,7 @@ res.status(400);
 
 ## routes.js
 
-사용하는 url을 변수화한 routes.js 파일에서 ':' 를 사용하면, 바꿀 수 있는 값이 됩니다. 그런데 이는 express는 이해하지만, HTML은 이를 이해하지 못하고, 실제 요소검사를 했을 때, :가 그대로 뜨게 됩니다.
+사용하는 url을 변수화한 routes.js 파일에서 ':' 를 사용하면, 값을 바꿀 수 있는 변수가 됩니다.
 
 ```javascript
 const USER_DETAIL = "/:id";
@@ -443,6 +472,8 @@ const routes = {
   userDetail: USER_DETAIL,
 };
 ```
+
+그런데 이는 express는 이해하지만, HTML은 이를 이해하지 못하고, 실제 요소검사를 했을 때, :id 가 그대로 뜨게 됩니다.
 
 ![image](https://user-images.githubusercontent.com/42775225/89121657-a3e82000-d4fb-11ea-86ba-957a67acb929.png)
 
@@ -464,16 +495,20 @@ const routes = {
 };
 ```
 
+**userRouter.js**
+
+'이 Url은 함수입니다.' 표시를 해줘야 합니다.
+
+```pug
+userRouter.get(routes.userDetail(), userDetail);
+```
+
+최종적으로 pug파일에서 userDetail로 가는 url을 사용할 때, pug파일에서 userDetail의 인자를 넘겨주어 동작할 수 있도록 합니다.
+
 **header.pug**
 
 ```pug
 a(href=routes.userDetail(user.id)) Profile
-```
-
-**userController.js**
-
-```pug
-userRouter.get(routes.userDetail(), userDetail);
 ```
 
 ## form을 통해서 controller로 받아올 때는 이렇게 사용하자!
@@ -483,3 +518,537 @@ const {
   body: { file, title, description },
 } = req;
 ```
+
+## MongoDB
+
+NoSQL 데이터 베이스이며, 규칙과 절차가 상대적으로 작습니다. 심지어 테이블이 없습니다.(대신 Schema가 있고, 데이터가 DB에 들어가기 전에 Schema를 확인하게 됩니다.) 장점은 document(JSON file)를 줄여주고, 생성이 매우 빠르고 엄격하지 않아서 채팅을 만들 때의 DB로 적합합니다. 우선, Node에서 MongoDB를 사용하려면, MongoCE(community edition)과 Moogoose가 필요합니다.
+
+### 세팅
+
+#### 1. MongoDB (comminity server) 다운로드
+
+_cf) https://docs.mongodb.com/manual/installation/_
+
+공식 홈페이지에서의 매뉴얼을 따르되, 되도록이면 맥의 경우 home brew를 이용하자.
+
+#### 2. Mongoose 다운로드
+
+이제 Javascript와 Mongo를 연결해줄 징검다리 역할이 필요합니다.
+
+```shell
+npm install mongoose
+```
+
+#### 3. dotenv 다운로드
+
+dotenv는 DB를 숨겨두고 싶을 때 사용할 수 있습니다. '.env' 라는 파일을 만들고 거기에 변수들을 정의합니다.(이것은 규칙입니다.) **_단, 반드시! gitignore에 .env파일을 포함시켜야합니다._**
+
+```shell
+npm install dotenv
+```
+
+### 사용
+
+**connect하는 URL**은
+
+```
+mongodb://localhost:포트번호/Database이름
+```
+
+**db.js**
+
+```javascript
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+dotenv.config(); // .env에 있는 변수들을 process.env 라는 객체로 불러옵니다.
+
+mongoose.connect(process.env.MONGO_URL, {
+  useNewUrlParser: true,
+  useFindAndModify: false,
+});
+
+const db = mongoose.connection;
+
+const handleOpen = () => console.log("✅ Connected to DB");
+const handleError = (error) =>
+  console.log(`❌ Error on DB Connection:${error}`);
+
+db.once("open", handleOpen);
+db.on("error", handleError);
+```
+
+_cf) userNewUrlParser, useFindAndModify는 이제 새로운 mongoose에는 다 기본적으로 되어 있을 테지만, 확실하게 하기 위해서 추가합니다. 해당 configuration을 사용하는지 안 하는지를 설정합니다._
+
+**init.js**
+
+```javascript
+import "./db";
+import app from "./app";
+import dotenv from "dotenv";
+dotenv.config();
+
+const PORT = process.env.PORT || 4000;
+
+app.listen(PORT, () => console.log(`✅Listening on: http://localhost:${PORT}`));
+```
+
+### Model
+
+MongoDB에 우리의 파일들이 어떤 식으로 생겨야 할지를 알려줘야 합니다. models라는 폴더를 만들고, 각 모델의 형태를 정의하는 파일들을 만듭니다. (모델은 통상적으로 대문자로 네이밍합니다.) 그리고 다음 2가지를 정의해야 합니다.
+
+#### 1. Model(Document 혹은 Collection)
+
+Schema를 기반하여 model(collection)이 만들어 집니다.
+
+#### 2. Schema
+
+데이터가 DB에 입력될 때 지켜야하는 형식입니다.
+
+예는 다음과 같습니다.
+
+**Video.js**
+
+```javascript
+import mongoose from "mongoose";
+
+const VideoSchema = new mongoose.Schema({
+  fileUrl: {
+    type: String,
+    required: "File URL is required",
+  },
+  title: {
+    type: String,
+    required: "Title is required",
+  },
+  description: String, // type:String과 동일
+  views: {
+    type: Number,
+    default: 0,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now, // ()를 붙여주면 지금 실행이라 없음
+  },
+});
+
+const model = mongoose.model("Video", VideoSchema);
+
+export default model;
+```
+
+그리고 init.js에도 추가해줘야 합니다.
+
+**init.js**
+
+```javascript
+import "./db";
+import app from "./app";
+import dotenv from "dotenv";
+dotenv.config();
+import "./models/Video"; // 이거 추가
+
+const PORT = process.env.PORT || 4000;
+
+app.listen(PORT, () => console.log(`✅Listening on: http://localhost:${PORT}`));
+```
+
+### DB
+
+db.js를 보면, mongoose.connect에서 "mongodb://localhost:27017/wetube" 로 연결되고 있습니다. 그래서 현재는 wetube라는 데이터 베이스 안에 있는 것입니다. 그리고 그 안에 수 많은 Model(collection)들이 있는 것입니다.
+
+여기서 사용되는 함수는 구글에서 Mongoose query를 검색해서 나오는 Documentation을 기반으로 했습니다.
+
+### DB에 값을 올리는 법
+
+_videoController.js_
+
+````javascript
+// Video 라는 모델(컬렉션)을 만들었다고 가정
+export const postUpload = async (req, res) => {
+  const {
+    body: { title, description },
+    file: { path },
+  } = req;
+  try {
+    const newVideo = await Video.create({  // 여기
+      fileUrl: path,
+      title,
+      description,
+    });
+    res.redirect(routes.videoDetail(newVideo.id));
+  } catch (error) {
+    console.log(error);
+  }
+};```
+
+or
+
+```javascript
+const db = client.db("wetube");
+db.collection("Video")
+  .insertOne({
+    title: "Vlog",
+    description: "My real life",
+  })
+  .then(function (result) {
+    // process result
+  });
+````
+
+### DB에 있는 값을 가져오는 법
+
+_videoController.js_
+
+```javascript
+export const home = async (req, res) => {
+  // find했을 때, 불러오는데 시간이 걸리기 때문에 async, await 조합
+  try {
+    const videos = await Video.find({}); // 여기
+    res.render("home", { pageTitle: "Home", videos });
+  } catch (error) {
+    console.log(error);
+    res.render("home", { pageTitle: "Home", videos: [] });
+  }
+};
+```
+
+or
+
+```javascript
+const db = client.db("wetube");
+const videos = db.collection("Video").find({});
+```
+
+그리고 여기서 찾은 element들을 정렬해서 보여주고 싶을 때는, find 후 sort를 사용합니다. 다음은 id를 기준으로, 역순으로 정렬하여 가져오는 예시입니다. (MongoDB는 데이터들이 \_id를 가집니다.)
+
+_videoController.js_
+
+```javascript
+const videos = await Video.find({}).sort({ _id: -1 });
+```
+
+### DB에 있는 값을 업데이트 하는 법
+
+일단, 수정한 뒤에 수정 완료 버튼을 누르는 것에서부터 시작하겠습니다.
+
+_editVideo.pug_
+
+```pug
+block content
+  .form-container
+    form(action=routes.editVideo(video.id), method="post")  // 여기서 이렇게 post로 넘겨줍니다.
+      input(type="text". placeholder="Title", name="title", value=video.title)
+      textarea(name="description", placeholder="Description")=video.description
+      input(type="submit", value="Update Video")
+```
+
+그러면 우선, 수정하고 있는 video의 id를 받아서 올바른 url로 변환을 하게 됩니다.
+
+```javascript
+const routes = {
+  editVideo: (id) => {
+    if (id) {
+      return `/videos/${id}/edit`;
+    } else {
+      return EDIT_VIDEO;
+    }
+  },
+};
+```
+
+그 뒤, 해당 url에서는 어떤 function을 부르는지 보기 위해서 라우터를 보게 됩니다. post로 제출했기 때문에 postEditVideo 를 호출하게 됩니다.
+
+_videoRouter.js_
+
+```javascript
+videoRouter.post(routes.editVideo(), postEditVideo);
+```
+
+해당 함수는 req.params.id와 같은 id를 DB에서 찾아서, 해당 video의 title과 description을 req.body.title과 req.body.description으로 바꿔줍니다. 이 때, MongoDB의 모델은 공식 문서에서 확인할 수 있듯이 \_id를 가집니다.
+
+_videoController.js_
+
+```javascript
+export const postEditVideo = async (req, res) => {
+  const {
+    params: { id },
+    body: { title, description },
+  } = req;
+
+  try {
+    await Video.findOneAndUpdate({ _id: id }, { title, description });
+    res.redirect(routes.videoDetail(id));
+  } catch {
+    res.redirect(routes.home);
+  }
+};
+```
+
+그러면, 끝!
+
+### DB에 있는 값을 삭제하는 방법
+
+이번에도 특정 video id에 해당하는 video를 삭제하는 것이므로, 특정 id를 받아서 router가 사용하는 url로 바꿔주는 부분부터 필요할 것입니다.
+
+_routes.js_
+
+```javascript
+const routes = {
+  deleteVideo: (id) => {
+    if (id) {
+      return `/videos/${id}/delete`;
+    } else {
+      return DELETE_VIDEO;
+    }
+  },
+};
+```
+
+그러면 위에서 만들어진 url로 왔을 때 delete의 절차를 밟으면 되는 것입니다. 이 때, get이 받는 url 부분은 string이 아닌, function이 되는 것은 앞에서 계속 했습니다.
+
+_videoRouter.js_
+
+```javascript
+videoRouter.get(routes.deleteVideo(), deleteVideo);
+```
+
+그러면, deleteVideo 함수에서 DB에서 해당 id를 찾고 delete하도록 해줍니다.
+
+_videoController.js_
+
+```javascript
+export const deleteVideo = async (req, res) => {
+  const {
+    params: { id },
+  } = req;
+  try {
+    await Video.findOneAndRemove({ _id: id }); // 여기
+  } catch (error) {
+    console.log(error);
+  }
+  res.redirect(routes.home);
+};
+```
+
+## DB에서 특정 단어를 포함하는 데이터 찾는 방법
+
+보통 이 경우에는 완전히 같은 단어를 찾는 것이 아니라, 정규 표현식을 사용하여 찾게 됩니다.
+
+## 참고) 정규 표현식 (Regular expression)
+
+정규 표현식은 string으로부터 특정 패턴에 해당하는 값을 가지고 오는 것입니다. 다음 링크에서 쉽게 사용해봅시다.
+
+추천 : https://regex101.com/
+
+### 표현식 테스트
+
+![image](https://user-images.githubusercontent.com/42775225/89726635-7c430b80-da57-11ea-9611-cb06f8a2a3df.png)
+
+### 패턴 참조하기
+
+![image](https://user-images.githubusercontent.com/42775225/89726662-ea87ce00-da57-11ea-8c35-b3df3d83e13b.png)
+
+사용자가 검색한 값을 searchingBy라는 변수에 담고, title에 해당 단어를 포함하고 있는 데이터를 반환받도록 해봅시다. (\$options: "i" 는 insensitive로 대소문자 구분을 하지 않도록 하는 것입니다.)
+
+_videoController.js_
+
+```javascript
+export const search = async (req, res) => {
+  const {
+    query: { term: searchingBy },
+  } = req;
+  let videos = [];
+  try {
+    videos = await Video.find({
+      // 여기
+      title: { $regex: searchingBy, $options: "i" },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+  res.render("search", { pageTitle: "Search", searchingBy, videos });
+};
+```
+
+## Javascript의 비동기 문법
+
+async-await 조합으로 사용합니다. (await은 async안에서만 사용할 수 있습니다.) await에 걸린 명령어가 수행되어야(결과가 성공이든 실패든 상관없이 수행되기만 하면) 다음 명령어로 넘어갈 수 있습니다.
+
+#### cf) 업로드할 때, 영상 파일 1개 만 받도록 해주기
+
+input 안에 다음 태그 추가
+
+```javascript
+accept = "video/*";
+```
+
+## multer
+
+form data에서 upload할 때 필요한 middleware입니다. middleware 단에서 file의 URL을 취하는 것이 대표적입니다.
+
+사용법은 간단합니다. 우선, multar을 적용하고자 하는 **form** 에서
+
+```javascript
+enctype = "multipart/form-data";
+```
+
+를 추가해 줍니다. 그리고는 multer로 middleware를 하나 만들어줍니다.
+
+**middleware.js**
+
+```javascript
+import multer from "multer";
+
+const multerVideo = multer({ dest: "uploads/videos/" });
+export const uploadVideo = multerVideo.single("videoFile");
+```
+
+single은 파일 1개만 허용하는 것이고, 그 뒤에 "videoFile"은 input의 name태그와 매칭됩니다.
+
+**upload.pug**
+
+```pug
+input(type="file", id="file", name="videoFile", required=true, accept="video/*", enctype = "multipart/form-data")
+```
+
+마지막으로, Router로 가서 middleware function을 추가해줍니다.
+
+**videoRouter.js**
+
+```javascript
+videoRouter.post(routes.upload, uploadVideo, postUpload);
+```
+
+이렇게까지 하면, 저희가 file을 업로드할 때, 서버에 있는 uploads/videos/에 파일이 업로드 됩니다. multer가 자기가 알아서 uploads/videos/라는 폴더를 만들고 그 안에 파일을 저장합니다. 그리고 postUpload는 file방식이 아닌 URL방식으로 해당 file에 접근하는 것입니다. 이 때 file과 관련된 정보는 req.body가 아니라 req.file에 담겨있습니다. (file URL은 req.file.path와 동일합니다.)
+
+이렇게 생성된 파일을 화면에 뿌려줄 때, middleware로
+
+**app.js**
+
+```javascript
+app.use("/uploads", express.static("uploads"));
+```
+
+를 이용합니다. 이는 사용자가 uploads라는 경로로 오게 되면, express.static의 인자로 넘겨주는 디렉토리로 들어간다는 것을 뜻합니다. 현재는 app.use("/videos", videoRouter)가 있어서 저렇게만 해주면, uploads를 깔았으니 videoRouter
+
+## const {} 최신 자바스크립트
+
+req에서 변수로 저장할 내용들이 많으면 많을 수록 아래 방식이 유리합니다.
+
+```javascript
+const myTitle = req.body.title;
+const id = req.params.id;
+```
+
+```javascript
+const {
+  body: { title: myTitle },
+} = req;
+const {
+  params: { id },
+} = req;
+```
+
+## ESLint
+
+Linter는 당신이 서버를 돌리기 전에, '여기에 에러가 있어요!' 라고 말해주는 도구입니다.
+
+```shell
+npm install eslint -D
+npm install eslint-plugin-prettier -D
+npm install eslint-config-prettier -D
+npm install prettier -D
+```
+
+이렇게 설치가 되었다면, init명령어를 통해서 자신에게 맞는 환경 설정을 해줍시다.
+
+```shell
+eslint --init
+```
+
+그리고 최종적으로 module.exports에서 다음 부분을 추가해줍니다.
+
+```javascript
+module.exports = {
+  extends: ["eslint:recommended", "plugin:prettier/recommended"],
+  rules: {
+    "no-console": "off",
+  },
+};
+```
+
+모든 에러를 다 찾아서 처리해줄 것 같이 들리기는 하지만, 제게 획기적으로 도움이 되지는 않았습니다.
+
+## Webpack
+
+웹팩은 module bundler(모듈을 묶는 것)인데요. 쉽게 생각하면, 최신 자바스크립트나 sass같은 여러 파일(모듈)들을 어떤 브라우저도 이해할 수 있는 일반적인 css, js 등으로 묶어주는 역할을 합니다. (단, 웹팩은 자바스크립트만 이해할 수 있습니다. 자바스크립트가 아닌 파일은 밑에 나올 Loader가 처리를 해줄 겁니다.)
+
+![image](https://user-images.githubusercontent.com/42775225/89727442-0abb8b00-da60-11ea-8e74-08234d07da96.png)
+
+절차는 다음과 같이 이루어집니다.
+
+### 1. Entry를 설정합니다.
+
+저희가 사용하는 파일들은 서로 import를 하면서 그래프처럼 연결되어 있을 것입니다. 그 파일들의 시작점이 되는 파일을 Entry라고 합니다. (설정은 path와 함께 파일명을 지정해주되, 여러개 설정 가능합니다.)
+
+cf) 설정하지 않으면, default는 ./src/index.js 입니다.
+
+### 2. Output을 설정합니다.
+
+웹팩이 bundle(묶기) 작업을 수행 후, 어느 경로에 파일을 저장할지를 Output이라고 합니다. 이를 설정해줍니다.
+
+### 3. Loader를 설정합니다.
+
+어떤 파일들을 어떻게 바꿔줄지를 설정하는 것입니다. _rules_ 속성 안에서 _test_ 에 정규표현식으로 파일을 명명하고, _use_ 에 원하는 로더를 지정해줍니다.
+
+cf)
+_options_ : 로더에 대한 옵션
+_exclude_ : 제외할 폴더
+_include_ : 포함할 폴더
+
+Entry, Output, Loaders, Plugins, Mode 라는 키워드를 기준으로,
+
+### 4. Plugin으로 Output을 가공합니다.
+
+## Webpack 사용법
+
+### 설치
+
+파일에서 사용할 수 있도록 하는 webpack과 터미널에서 사용할 수 있도록 하는 webpack-cli를 설치합니다.
+
+```shell
+npm install webpack webpack-cli
+```
+
+그리고 _webpack.config.js_ 라는 설정파일을 만듭니다. 왜냐하면, 웹팩은 기본적으로 _webpack.config.js_ 파일을 찾기 때문입니다. 물론, config 설정을 통해 파일명을 수정할 수도 있습니다. 하지만 저희는 그냥 위의 이름으로 설정 파일을 만듭시다.
+
+**_config 파일 안에는 server 코드와 연관 되어서는 않됩니다. 오직 client 코드입니다. (babel-node는 사용할 수 없기에 옛날 자바스크립트 코드를 사용해야 합니다.)_**
+
+또한, 웹팩은 기본적으로 exported configuration object를 찾게 되어 있고,
+
+**webpack.config.js**
+
+```javascript
+```
+
+그리고 package.json 를 수정합니다. 저희는 이제 더 이상 npm start를 쓰지 않습니다.
+
+**package.json**
+
+```json
+
+```
+
+이제 앞으로는,
+
+```shell
+npm run dev:server  // 기존의 npm start 역할
+```
+
+와
+
+```shell
+npm run dev:assets  // webpack를 부르는 역할
+```
+
+를 각각 다른 콘솔에서 실행시킬 것입니다.
