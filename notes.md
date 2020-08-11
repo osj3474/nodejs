@@ -997,9 +997,27 @@ cf) 설정하지 않으면, default는 ./src/index.js 입니다.
 
 웹팩이 bundle(묶기) 작업을 수행 후, 어느 경로에 파일을 저장할지를 Output이라고 합니다. 이를 설정해줍니다.
 
-### 3. Loader를 설정합니다.
+### 3. Loader를 설정합니다. (module)
 
-어떤 파일들을 어떻게 바꿔줄지를 설정하는 것입니다. _rules_ 속성 안에서 _test_ 에 정규표현식으로 파일을 명명하고, _use_ 에 원하는 로더를 지정해줍니다.
+어떤 파일들을 어떻게 바꿔줄지를 설정하는 것입니다. 웹팩은 자바스크립트 밖에 모르기 때문에, PNG는 PNG라고, css는 css라고 이해시켜야 합니다. _rules_ 속성 안에서 _test_ 에 정규표현식으로 이해시키고 싶은 파일을 명명하고, _use_ 에 원하는 로더를 지정해줍니다.
+
+cf) scss파일들을 찾아서 css로 바꾸고, 전체 텍스트 중에 css의 텍스트만 뽑아서 분리된 하나의 파일을 만드는 것입니다. (웹팩은 config 파일이 아래에서 위로 실행되기 때문에 위의 과정을 역순으로 코딩핸나가야 합니다.)
+
+그러기 위해서 plugin과 loader 들을 설치해줘야 합니다.
+
+```shell
+# npm install extract-text-webpack-plugin@next // 이제 지원 안하는듯
+npm install mini-css-extract-plugin
+npm install css-loader postcss-loader sass-loader babel-loader
+npm install autoprefixer
+npm install node-sass
+```
+
+cf) npm에서는 deprecated 인 경우가 많아서, 새로운 버전으로 사용하고 싶을 때는 @를 붙여서 버전을 명시할 수 있습니다. (@next이면, 베타 버전이 설치됩니다.)
+
+### 4. Mode를 설정합니다.
+
+mode는 production으로 할 때, 코드가 압축됩니다. 하지만, 개발하는 동안에는 코드가 압축되면 어디에서 에러가 났는지 볼 수 없기 때문에, development로 설정합니다.
 
 cf)
 _options_ : 로더에 대한 옵션
@@ -1007,8 +1025,6 @@ _exclude_ : 제외할 폴더
 _include_ : 포함할 폴더
 
 Entry, Output, Loaders, Plugins, Mode 라는 키워드를 기준으로,
-
-### 4. Plugin으로 Output을 가공합니다.
 
 ## Webpack 사용법
 
@@ -1029,6 +1045,60 @@ npm install webpack webpack-cli
 **webpack.config.js**
 
 ```javascript
+// 여기서는 모던 js 사용 불가
+const path = require("path"); // 절대 경로를 설정할 수 있도록 해주는 패키지
+const autoprefixer = require("autoprefixer");
+const MiniExtractCSS = require("mini-css-extract-plugin");
+
+const MODE = process.env.WEBPACK_ENV;
+const ENTRY_FILE = path.resolve(__dirname, "assets", "js", "main.js"); // __dirname : 현재 프로젝트 디렉토리 이름 (전역 변수임)
+const OUTPUT_DIR = path.join(__dirname, "static"); // static 폴더로 export함
+
+const config = {
+  entry: ENTRY_FILE,
+  mode: MODE,
+  module: {
+    rules: [
+      {
+        test: /\.scss$/,
+        use: [
+          {
+            loader: MiniExtractCSS.loader,
+            options: {
+              hmr: process.env.WEBPACK_ENV === "development",
+            },
+          },
+          "css-loader",
+          {
+            loader: "postcss-loader",
+            options: {
+              plugins() {
+                return [
+                  autoprefixer({
+                    overrideBrowserslist: "cover 99.5%",
+                  }),
+                ];
+              },
+            },
+          },
+
+          "sass-loader",
+        ],
+      },
+    ],
+  },
+  output: {
+    path: OUTPUT_DIR,
+    filename: "[name].js",
+  },
+  plugins: [
+    new MiniExtractCSS({
+      filename: "styles.css",
+    }),
+  ],
+};
+
+module.exports = config;
 ```
 
 그리고 package.json 를 수정합니다. 저희는 이제 더 이상 npm start를 쓰지 않습니다.
@@ -1036,7 +1106,11 @@ npm install webpack webpack-cli
 **package.json**
 
 ```json
-
+  "scripts": {
+    "dev:server": "nodemon --exec babel-node init.js --delay 2",
+    "dev:assets": "WEBPACK_ENV=development webpack -w",
+    "build:assets": "WEBPACK_ENV=production webpack"
+  },
 ```
 
 이제 앞으로는,
@@ -1048,7 +1122,96 @@ npm run dev:server  // 기존의 npm start 역할
 와
 
 ```shell
-npm run dev:assets  // webpack를 부르는 역할
+npm run dev:assets  // webpack를 부르고 파일들을 지켜보는 역할
+```
+
+cf) -w를 붙여주는 이유 : css 파일을 수정할 때마다 webpack을 끄고 다시 실행시키고 싶지는 않기 때문
+
+cf) 윈도우로 진행하시는 분들이 있다면!
+
+```shell
+npm install --save-dev cross-env 하시고
+
+"dev:assets": "cross-env WEBPACK_ENV=development webpack",
+"build:assets": "cross-env WEBPACK_ENV=production webpack"
+```
+
+와
+
+```shell
+npm run build:assets // 코드를 server에 올려주는 역할
 ```
 
 를 각각 다른 콘솔에서 실행시킬 것입니다.
+
+_cf) webpack으로 생성된 폴더 트리는 다음과 같습니다._
+
+- webpack.config.js
+- js
+  - main.js
+- scss
+  - config
+    - \_variables.scss
+  - styles.scss
+
+_cf) 대부분의 경우는 webpack에 대한 도구를 이미 많이 만들어놔서 이를 몰라도 크게 문제될 것은 없습니다._
+
+거의 다 왔습니다. 결국, 사용하기 위해서 기존 파일에서 link를 달아야 합니다.
+
+**main.pug**
+
+```pug
+doctype html
+html
+    head
+        <script src="https://kit.fontawesome.com/d49c4080ea.js" crossorigin="anonymous"></script>
+        title #{pageTitle} | #{siteName}
+        link(rel="stylesheet", href="/static/styles.css")  // 여기
+    body
+        include ../partials/header
+        main
+            block content
+        include ../partials/footer
+        script(src="/static/main.js")  // 여기
+```
+
+그리고 서버에게도 이 사실을 가르쳐 줍니다. route에는 static이라는 곳이 존재하지 않기 때문입니다. 누군가 /static 으로 접근하려고 하면, static 폴더로 가라고 가르쳐 줍니다.
+
+**app.js**
+
+```javascript
+app.set("view engine", "pug");
+app.use("/uploads", express.static("uploads"));
+app.use("/static", express.static("static")); // 여기
+app.use(helmet());
+app.use(cookieParser());
+app.use(bodyParser.json());
+```
+
+**.gitignore**
+
+```
+static
+```
+
+이렇게 끝이 납니다.
+
+cf) regeneratorRuntime 에러가 브라우저 콘솔 창에 발생했다면!
+
+![image](https://user-images.githubusercontent.com/42775225/89851587-c945ef80-dbc7-11ea-9c49-a046cbeaf3a7.png)
+
+이것은 크롬이 async를 어떻게 처리해야하는지 모르는 것입니다. 이 때는, polyfill을 설치래햐 합니다.
+
+```shell
+npm install @babel/polyfill
+```
+
+브라우저에 없는 부분을 메워주는 자바스크립트 파일입니다. 자세한 사항은 공식 문서를 확인하길 바랍니다.
+
+**webpack.config.js**
+
+```javascript
+const config = {
+  entry: ["@babel/polyfill", ENTRY_FILE],  //여기 추가
+  ...
+```
