@@ -1215,3 +1215,179 @@ const config = {
   entry: ["@babel/polyfill", ENTRY_FILE],  //여기 추가
   ...
 ```
+
+## Passport 사용자 인증
+
+사용자 인증과 관련된 미들웨어입니다. 쿠키를 생성하고, 브라우저에 저장시키는 일을 합니다. 가령, 브라우저 상에 쿠키를 설정해주면 그 쿠키를 통해서 사용자 ID 등을 알 수 있습니다. 그러면 Passport가 브라우저에서 자동으로 쿠키를 가져와서 인증이 완료된 User Object를 Controller에게 넘겨주는 일을 수행합니다.
+
+_cf) 쿠키란?_
+
+브라우저에 저장할 수 있는 것들로, 모든 요청에 대해 백엔드로 전송될 정보들이 담겨 있습니다. 가령, 사용자가 로그인 요청을 하면, 브라우저가 자동적으로 쿠키들을 서버로 전송하게 됩니다.
+
+_cf) Passport의 Strategy_
+
+접속 방식을 뜻합니다. local, facebook, github 같은 것들을 사용할 수 있습니다.
+
+_cf) Passoport는 현재 로그인 한 사용자를 뜻하는 req.user를 자동적으로 만들어줍니다._
+
+### 사용
+
+User model을 위한 passport-local-mongoose 라는 모듈입니다. 사용자 기능을 추가할 수 있습니다. (패스워드 생성, 변경, 확인, 암호화 등등)
+
+그것 말고도 인증에 필요한 모듈들을 모두 다운 받습니다.
+
+```shell
+npm i passport-local-mongoose  # MongoDB 인증 방식
+npm i passport                 # 인증
+npm i passport-local           # local 인증 방식
+npm i passport-facebook        # facebook 인증 방식
+npm i passport-github          # github 인증 방식
+```
+
+그리고 User Model를 생성합니다.
+
+**User.js**
+
+```javascript
+import mongoose from "mongoose";
+import passportLocalMongoose from "passport-local-mongoose";
+
+const UserSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  avatarUrl: String,
+  facebookId: Number,
+  githubId: Number,
+});
+
+UserShcema.plugin(passportLocalMongoose, { usernameField: "email" });
+
+const model = mongoose.model("User", UserShcema);
+
+export default model;
+```
+
+위의 코드에서 한 가지 알아야 할 점은 usernameField입니다. usernameField는 username이 될 field를 명시합니다. username은 사용자의 이름이 될 수도 있고, 이메일이 될 수도 있고 선택하기 나름입니다. 그 중에 어떤 field를 username으로 사용할 것인지 _passport-local-mongoose_ 에게 알려줘야 합니다.
+
+**init.js**
+
+```javascript
+import "./models/User"; // 모델 추가
+```
+
+그 다음으로는 실제 인증과 관련된 코드를 passport.js에 넣을 텐데, 그 전에 다음을 알아둡시다.
+
+- serialization : (**_User를 주면 --> id만 저장해_**) 쿠키가 어떤 정보를 가질 수 있느냐, 다시 말해 어떤 field가 쿠키에 포함될 것인지를 알려줍니다. 브라우저에 있는, 사용자의 어떤 정보를 가질 수 있느냐 하는 것입니다. (쿠키에 있는 정보는 자동으로 벡엔드 쪽으로 전송됩니다. 쿠키는 아주 작아야하고, 민감한 정보가 담겨서는 안됩니다.)
+
+- deserialization : (**_id를 주면 --> User를 식별해_**) 어느 사용자인지 어떻게 찾느냐, 다시 말해 쿠키를 받아서 사용자로 전환하는 것을 말합니다.
+
+**passport.js**
+
+````javascript
+import passport from "passport";
+import User from "./models/User";
+
+passport.use(User.createStraategy());
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());```
+````
+
+이렇게까지만 해주면, 사용자 인증과 관련된 것은 준비가 다 되었고, 미들웨어를 추가해줍니다.
+
+**userController.js**
+
+```javascript
+try {
+  const user = await User({
+    name,
+    email,
+  });
+  await User.register(user, password);
+} catch (error) {
+  console.log(error);
+}
+```
+
+위의 부분이 DB에 사용자를 등록하는 것까지 한 것입니다. db.users.find({}) 를 해보면, 사용자들을 볼 수 있을 것입니다. 하지만, 웹 브라우저에서 쿠키 란을 가보면, 쿠키가 없습니다. 그것은 아직 로그인을 하지 않아서 입니다. 로그인까지 해서 코드를 완성해봅시다.
+
+**globalRouter.js**
+
+```javascript
+globalRouter.post(routes.join, postJoin, postLogin);
+```
+
+전에 만들었던 postJoin이 middleware의 역할을 하도록 설계합니다.
+
+**userController.js**
+
+```javascript
+import passport from "passport";
+import routes from "../routes";
+import User from "../models/User";
+
+export const postJoin = async (req, res, next) => {
+  // console.log(req.body);
+  const {
+    body: { name, email, password, password2 },
+  } = req;
+  if (password !== password2) {
+    res.status(400);
+    res.render("join", { pageTitle: "Join" });
+  } else {
+    // To Do : Register User
+    try {
+      const user = await User({
+        name,
+        email,
+      });
+      await User.register(user, password);
+      next();
+    } catch (error) {
+      console.log(error);
+      res.redirect(routes.home);
+    }
+  }
+};
+
+export const postLogin = passport.authenticate("local", {
+  failureRedirect: routes.login,
+  successRedirect: routes.home,
+});
+```
+
+그러면, 전역으로 사용되는 user를 req.user로 바꾸고, 세션만 설정해주면 끝입니다.
+
+**middleware.js**
+
+````javascript
+export const localMiddleware = (req, res, next) => {
+  res.locals.siteName = "Wetube";
+  res.locals.routes = routes;
+  res.locals.user = req.user || {};  // 여기
+  next();
+};
+```
+
+세션을 사용하기 위해 다음을 설치합시다. Express는 세션을 이용해서 쿠키를 얻을 수 있습니다.
+
+```shell
+npm i express-session
+````
+
+**app.js**
+
+```javascript
+import passport from "passport";
+import session from "express-session";
+import "./passport";
+
+// cookie parser 보다 뒤에 두기!
+app.use(session());
+app.use(passport.initialize());
+app.use(passport.session());
+```
+
+_cf) 위에서 사용된 secret은 무작위 문자열로, 쿠키에 있는 session ID를 암호화하기 위한 것입니다._
+
+randomkeygen.com에 들어가서 랜덤한 string을 얻어서 secret의 인자로 줍니다. 이 때, .env에 해당 문자열을 숨겨서 넘겨주도록 합니다.
