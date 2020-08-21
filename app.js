@@ -3,7 +3,7 @@ import morgan from "morgan";
 import helmet from "helmet";
 import bodyParser from "body-parser";
 import passport from "passport";
-import session from "session";
+import session from "express-session";
 import cookieParser from "cookie-parser";
 import globalRouter from "./routers/globalRouter";
 import userRouter from "./routers/userRouter";

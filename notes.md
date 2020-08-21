@@ -24,6 +24,10 @@ _cf) mac을 기준으로 적었습니다. 양해 바랍니다._
 
 #### 2. nodejs 설치 (by brew)
 
+```shell
+brew install node
+```
+
 node.js를 설치하면, 자동적으로 npm(앱스토어 같이 패키지를 담아두고 관리하는 것)이 설치됩니다. 그 때부터 다음의 명령어를 사용합니다.
 
 ## Server started
@@ -53,6 +57,8 @@ npm install
 ```
 
 하면 필요한 패키지 다운로드 끝~
+
+추가로 해야할 것 : (mongodb 확인, dotenv 확인)
 
 ## 서버 확인
 
@@ -531,6 +537,11 @@ _cf) https://docs.mongodb.com/manual/installation/_
 
 공식 홈페이지에서의 매뉴얼을 따르되, 되도록이면 맥의 경우 home brew를 이용하자.
 
+```shell
+brew tap mongodb/brew
+brew install mongodb-community@4.4
+```
+
 #### 2. Mongoose 다운로드
 
 이제 Javascript와 Mongo를 연결해줄 징검다리 역할이 필요합니다.
@@ -683,7 +694,7 @@ export const postUpload = async (req, res) => {
 
 or
 
-```javascript
+​```javascript
 const db = client.db("wetube");
 db.collection("Video")
   .insertOne({
@@ -881,6 +892,10 @@ input 안에 다음 태그 추가
 ```javascript
 accept = "video/*";
 ```
+
+#### cf) 샘플 영상 (big buck bunny)
+
+https://test-videos.co.uk/bigbuckbunny/mp4-h264
 
 ## multer
 

@@ -5,6 +5,7 @@ dotenv.config(); // .env에 있는 변수들을 process.env 라는 객체로 불
 mongoose.connect(process.env.MONGO_URL, {
   useNewUrlParser: true,
   useFindAndModify: false,
+  useUnifiedTopology: true,
 });
 
 const db = mongoose.connection;
