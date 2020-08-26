@@ -13,6 +13,7 @@
       margin-bottom: 15px;
     }
     span {
+      color: inherit;
       margin-right: 10px;
       font-size: 20px;
     }
@@ -22,7 +23,7 @@
     color: white;
   }
   .social-login--facebook {
-    background-color: #3a5998;
     color: white;
+    background-color: #3a5998;
   }
 }

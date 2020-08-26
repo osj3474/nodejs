@@ -1262,13 +1262,65 @@ app.use(
 
 _cf) 쿠키란?_
 
-브라우저에 저장할 수 있는 것들로, 모든 요청에 대해 백엔드로 전송될 정보들이 담겨 있습니다. 가령, 사용자가 로그인 요청을 하면, 브라우저가 자동적으로 쿠키들을 서버로 전송하게 됩니다.
+브라우저에 저장되는 것으로, 모든 요청에 대해 백엔드로 전송될 정보들이 담겨 있습니다. 이 때, 쿠키에는 사용자를 식별 가능한 ID 값만이 저장됩니다.(serialization)
+
+_cf) 세션이란?_
+
+서버에 저장되는 것으로, 사용자 정보에 대한 실제 데이터에 대한 정보들이 담겨 있습니다. 쿠키를 해석하고(deserialization), 해당 ID에 대한 실제 데이터에 접근하게 됩니다. 현재, passport에서 사용하는 session은 기본적으로, 세션 정보가 (휘발성)메모리에 저장되기 때문에, 서버를 껏다가 키면 세션이 날라갑니다. file이나 DB를 이용해서 저장해야 합니다.
+
+_파일에 저장하는 경우의 예시_
+
+```shell
+npm i -s session-file-store
+```
+
+```javascript
+vaar FileStore = require('session-file-store')(session)
+
+app.use(
+  session({
+    secret: "blabla",
+    resave: false,
+    saveUninitialized: true,
+    store: new FileStore(),
+  })
+);
+```
+
+### MongoDB에 세션 저장하기
+
+MongoDB에 세션을 저장하기 위해서 connect-mongo를 이용할 것입니다.
+
+```shell
+npm i connect-mongo
+```
+
+**_app.js_** 에 다음을 추가합니다.
+
+```javascript
+import MongoStore from "connect-mongo";
+import mongoose from "mongoose";
+...
+
+const CookieStore = MongoStore(session)
+
+app.use(
+  session({
+    secret: process.env.COOKIE_SECRET,
+    resave: true,
+    saveUninitialized: false,
+    store: new CookieStore({
+      mongooseConnection: mongoose.connection,
+    }),
+  })
+);
+```
 
 _cf) Passport의 Strategy_
 
 접속 방식을 뜻합니다. local, facebook, github 같은 것들을 사용할 수 있습니다.
 
-_cf) Passoport는 현재 로그인 한 사용자를 뜻하는 req.user를 자동적으로 만들어줍니다._
+**_cf) Passoport는 현재 로그인 한 사용자를 뜻하는 req.user를 자동적으로 만들어줍니다. Passport의 훌륭함..._**
 
 ### 사용
 
@@ -1443,3 +1495,260 @@ _https://www.youtube.com/watch?v=uoq3Bp7nKUA&list=PLuHgQVnccGMCHjWIDStjaZA2ZR-jw
 _cf) 위에서 사용된 secret은 무작위 문자열로, 쿠키에 있는 session ID를 암호화하기 위한 것입니다._
 
 randomkeygen.com에 들어가서 랜덤한 string을 얻어서 secret의 인자로 줍니다. 이 때, .env에 해당 문자열을 숨겨서 넘겨주도록 합니다.
+
+## Private, Public
+
+쿠키와 세션까지 했다면, 로그인 된 상태에서의 요소들과 로그인 되지 않은 상태에서의 요소들을 구분할 필요가 생깁니다. 각각을 Private, Public이라고 합시다. Passport의 훌륭함으로 로그인이 되었다면, req.user가 자동으로 생서됩니다. 그래서 저희는 req.user의 존재 여부에 따라 접근을 제한하는 코드만 추가하면 됩니다.
+
+**_middleware.js_**
+
+```javascript
+export const onlyPublic = (req, res, next) => {
+  if (req.user) {
+    res.redirect(routes.home);
+  } else {
+    next();
+  }
+};
+
+export const onlyPrivate = (req, res, next) => {
+  if (req.user) {
+    next();
+  } else {
+    res.redirect(routes.home);
+  }
+};
+```
+
+그런 다음에 Router들 중간에 해당 확인 작업을 거치도록 합니다.
+
+예시)
+
+**_userRouter.js_**
+
+```javascript
+import { onlyPrivate } from "../middleware";
+...
+
+userRouter.get(routes.editProfile, onlyPrivate, editProfile);
+```
+
+## 소셜 서비스로 로그인하기
+
+어떤 식으로 진행되는지 먼저 짚고 가겠습니다. 일단, 사용자가 소셜 로그인(facebook)을 하겠다고 하면, 저희 서버는 facebook으로 사용자를 보내는데, 저희 서버에서 필요한 사용자 정보도 함께 요청합니다. 그러면, facebook은 사용자에게 "정보를 줄까요?" 라고 사용자에게 묻고, 사용자가 "Okay" 하면, facebook이 사용자를 저희 서버로 다시 보냄과 동시에 사용자 정보도 함께 보내줍니다.
+
+cf) http://www.passportjs.org/packages/
+
+## Github로 로그인하기
+
+Github로 로그인하기를 하려면, 먼저 Github 개발자 페이지에서 application 등록을 해야합니다.
+
+### 1. Github application 등록
+
+#### 1) github.com -> Settings
+
+![image](https://user-images.githubusercontent.com/42775225/91257139-17e8b180-e7a4-11ea-8bcf-02bb41ca2397.png)
+
+#### 2) Developer settings
+
+![image](https://user-images.githubusercontent.com/42775225/91257228-567e6c00-e7a4-11ea-9a2b-d3c35cc61453.png)
+
+#### 3) OAuth App
+
+![image](https://user-images.githubusercontent.com/42775225/91257864-e8d33f80-e7a5-11ea-9def-d4bcf8dde2f9.png)
+
+#### 4) 내용 채워넣기
+
+Application name, Homepage URL, Application description, Application callback URL을 채워넣습니다.
+
+![image](https://user-images.githubusercontent.com/42775225/91258044-5c754c80-e7a6-11ea-820a-d88cbaa1be1d.png)
+
+#### 5) Client ID, Client Secret 준비
+
+**_절대 Never, ever, 에버, 에버 유출 금지_**
+
+반드시 .env에 넣으시고, gitignore로 처리 되었는지 또 확인!
+
+![image](https://user-images.githubusercontent.com/42775225/91258143-a0685180-e7a6-11ea-91b4-7e64cd935e2f.png)
+
+### 2. 모듈 설치
+
+그리고 passport-github 모듈을 설치해야 합니다.
+
+```shell
+npm i passport-github
+```
+
+### 3. ID, SECRET 숨기기 (다시 확인!)
+
+**_.env_**
+
+```javascript
+GH_ID = "아이디";
+GH_SECRET = "시크릿";
+```
+
+### 4. passport-github 사용하기
+
+이제 세팅이 끝났으니 직접 사용해 봅시다. 사용 순서도 생각해봅시다.
+
+#### 1) routes 객체에 URL 추가해준다.
+
+**_routes.js_**
+
+```javascript
+// Github
+const GITHUB = "/auth/github";
+const GITHUB_CALLBACK = "/auth/github/callback";
+
+const routes = {
+  ...,
+  gitHub: GITHUB,
+  githubCallback: GITHUB_CALLBACK,
+}
+```
+
+#### 2) 사용자가 **Github로 로그인하기** 버튼을 누르면 사용자를 Github로 보내준다.
+
+**_socialLogin.pug_**
+
+```pug
+.social-login
+    button.social-login--github
+        a(href=routes.gitHub)      // 여기 추가
+            span
+                i.fab.fa-github
+            |Continue with Github
+    button.social-login--facebook
+        span
+            i.fab.fa-facebook
+        |Continue with Facebook
+```
+
+**_globalRouter.js_**
+
+```javascript
+import {
+  getJoin,
+  postJoin,
+  getLogin,
+  postLogin,
+  logout,
+  githubLogin, // 추가
+} from "../controllers/userController";
+
+globalRouter.get(routes.gitHub, githubLogin);
+```
+
+**_userController.js_**
+
+```javascript
+export const githubLogin = passport.authenticate("github");
+```
+
+**_passport.js_**
+
+```javascript
+import passport from "passport";
+import GithubStrategy from "passport-github";
+import User from "./models/User";
+import routes from "./routes";
+import { githubLoginCallback } from "./controllers/userController";
+
+passport.use(User.createStrategy());
+
+passport.use(
+  new GithubStrategy(
+    {
+      clientID: process.env.GH_ID,
+      clientSecret: process.env.GH_SECRET,
+      callbackURL: `http://localhost:4000${routes.githubCallback}`,
+    },
+    githubLoginCallback
+  )
+);
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+```
+
+#### 3) 사용자가 승낙해서 Github에서 다시 우리 서버로 오면, 실행될 함수(Callback) 정의
+
+어떤 사람이 `http://localhost:4000${routes.githubCallback}` 여기로 접근했다면, 그 사용자는 Github로 로그인하기 승낙을 한 사람일 것입니다. 그러면 실행되는 함수가 **_passport.js_** 의 **githubLoginCallback** 입니다.
+
+**_globalRouter.js_**
+
+```javascript
+import passport from "passport"; // 추가
+import {
+  getJoin,
+  postJoin,
+  getLogin,
+  postLogin,
+  logout,
+  githubLogin,
+  githubLoginCallback, // 추가
+} from "../controllers/userController";
+
+globalRouter.get(
+  routes.githubCallback,
+  passport.authenticate("github", { failureRedirect: "/login" }),
+  postGithubLogIn
+);
+```
+
+**_userController.js_**
+
+저희가 원하는 정보들은 profile의 \_json객체에 담겨 있습니다. cb 함수는 passport가 제공하는 callback 함수로, **user** 를 인자로 받아서 인증을 해주게 됩니다. 이 때, cb 함수의 인자로 user객체 없이 \*_에러만_ 넣어서 호출하면, 사용자를 찾지 못했을 경우의 함수가 실행됩니다.
+
+````javascript
+// export const githubLoginCallback = (accessToken, refreshToken, profile, cb) => {
+//   //SOMETHING
+// };
+
+export const githubLoginCallback = async (_, __, profile, cb) => {
+  const {
+    _json: { id, avatar_url, name, email },
+  } = profile;
+  try {
+    // 이메일을 휴대폰 번호와 같은 역할을 한다고 가정.
+    // 이미 다른 방법으로 가입한 적이 있을까봐
+
+    // 전에 가입한 적이 있다면, github_id만 업데이트
+    const user = await User.findOne({ email });
+    if (user) {
+      user.githubId = id;
+      user.save();
+      return cb(null, user);
+    }
+
+    // 전에 가입한 적이 없다면, User 모델에 추가
+    const newUser = await User.create({
+      email,
+      name,
+      githubId: id,
+      avatarUrl: avatar_url,
+    });
+    return cb(null, newUser);
+  } catch (error) {
+    return cb(error);
+  }
+};
+
+export const postGithubLogIn = (req, res) => {
+  res.redirect(routes.home);
+};
+```
+
+**githubLoginCallback** 의 결과가 문제 없이 되었다면, 실행되는 것이, **postGithubLogIn** 입니다.
+
+cf) 로그아웃은 req.logout() 이면 됩니다. passport가 쿠키 등등 관련된 것들을 모두 처리해줍니다.
+
+**_userController.js_**
+
+```javascript
+export const logout = (req, res) => {
+  req.logout();
+  res.redirect(routes.home);
+};
+````
