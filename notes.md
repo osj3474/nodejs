@@ -41,6 +41,7 @@ npm install express   // express 설치
 
 **_npm 명령어는 반드시!! package.json이 있는 곳에서 명령어를 실행해야 합니다._**
 **_아니면 의도하지 않은 곳에 packge.json이 또 생깁니다._**
+**_추후에 npm install 모듈 --save 가 나오는데, --save를 붙여주면, 해당 프로젝트는 해당 모듈에 의존하고 있음을 명시적으로 설정해주는 것을 의미합니다._**
 
 ## Github & gitignore
 
@@ -1231,6 +1232,30 @@ const config = {
   ...
 ```
 
+## 쿠키와 세션 제대로 알기
+
+먼저 쿠키와 세션이 탄생할 수 밖에 없었던 이유를 이해해봅시다. 사용자마다 다른 웹페이지 즉, 로그인도 하지 않았는데, 장바구니에 담은 물건이 그대로 남아있거나, 한 번 인증을 했다면, 다시 페이지를 띄웠을 때, 다시 인증을 하지 않아도 되는 것과 같은 편리한 기능들이 바로 이 쿠키와 세션을 통해 만들어졌습니다.
+
+쿠키는 웹 브라우저에 저장되어 있으며, 1.인증 2.개인화 3.방문자체크 를 만족시킬 수 있습니다. 사용자가 웹 브라우저를 통해 서버에 요청을 보낼 때, 해당 사용자에 대한 정보를 쿠키에 저장할 수 있습니다. 그런데, 브라우저에 사용자의 비밀번호와 같은 중요한 정보를 담는 것은 보안적으로 상당히 위험합니다. 그래서 브라우저, 즉 쿠키에는 사용자를 식별할 수 있는 ID값 만을 저장하고, 중요한 정보들은 서버에 안전하게 저장하도록 합니다. 이 때, 서버에 사용자의 데이터를 저장하는 곳이 바로 세션입니다. 아래의 그림을 봅시다.
+
+![스크린샷 2020-08-21 오후 8 02 46](https://user-images.githubusercontent.com/42775225/90883728-59b2da00-e3e9-11ea-80d8-255afb033e85.png)
+
+서버를 관리하는 저희 개발자들의 입장에서 쿠키를 어떻게 생성하고 읽을 수 있는지 참고하기 바랍니다.
+
+![스크린샷 2020-08-21 오후 8 02 53](https://user-images.githubusercontent.com/42775225/90883732-5b7c9d80-e3e9-11ea-993a-25398d68ec04.png)
+
+세션은 다음부터 시작되는 express의 session을 통해 nodejs 상에서의 쿠키와 세션 사용을 알아봅시다.
+
+```javascript
+app.use(
+  session({
+    // SOMETHING,
+  })
+);
+```
+
+위와 같이 미들웨어가 생성이 되면, req.session이라는 객체가 생긴다. 또한 req.session.변수명 = 값 으로 값을 할당해줄 수도 있습니다.
+
 ## Passport 사용자 인증
 
 사용자 인증과 관련된 미들웨어입니다. 쿠키를 생성하고, 브라우저에 저장시키는 일을 합니다. 가령, 브라우저 상에 쿠키를 설정해주면 그 쿠키를 통해서 사용자 ID 등을 알 수 있습니다. 그러면 Passport가 브라우저에서 자동으로 쿠키를 가져와서 인증이 완료된 User Object를 Controller에게 넘겨주는 일을 수행합니다.
@@ -1384,7 +1409,7 @@ export const localMiddleware = (req, res, next) => {
 };
 ```
 
-세션을 사용하기 위해 다음을 설치합시다. Express는 세션을 이용해서 쿠키를 얻을 수 있습니다.
+세션을 사용하기 위해 다음을 설치합시다. Express는 세션을 이용해서 **쿠키를 얻을 수** 있습니다.
 
 ```shell
 npm i express-session
@@ -1398,10 +1423,22 @@ import session from "express-session";
 import "./passport";
 
 // cookie parser 보다 뒤에 두기!
-app.use(session());
+
+// 이렇게 session을 미들웨어로 사용하기로 하면, req.session 객체가 생깁니다.
+// get에서 처리해줄 때, req.session.변수명 = 값  으로 값을 할당할 수도 수정할 수도 있습니다.
+app.use(session(
+session({
+    secret: process.env.COOKIE_SECRET,
+    resave: true,
+    saveUninitialized: false,
+  })
+);
 app.use(passport.initialize());
 app.use(passport.session());
 ```
+
+_cf) session의 파라미터는 어떻게 줘야할지 더 알게되면 판단하기! 니콜라스와 생활코딩이 정반대로 말해주고 있어서 판단을 못 내리는 중._
+_https://www.youtube.com/watch?v=uoq3Bp7nKUA&list=PLuHgQVnccGMCHjWIDStjaZA2ZR-jwq-WU&index=3_
 
 _cf) 위에서 사용된 secret은 무작위 문자열로, 쿠키에 있는 session ID를 암호화하기 위한 것입니다._
 

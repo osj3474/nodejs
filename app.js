@@ -23,6 +23,8 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan("dev"));
+
+// 이거는 session을 이용해서 cookie를 얻는 과정
 app.use(
   session({
     secret: process.env.COOKIE_SECRET,
@@ -30,6 +32,8 @@ app.use(
     saveUninitialized: false,
   })
 );
+
+// 초기화하고, session이 가진 cookie를 이용하겠다는 것
 app.use(passport.initialize());
 app.use(passport.session());
 
