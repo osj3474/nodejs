@@ -1450,6 +1450,10 @@ export const postLogin = passport.authenticate("local", {
 
 그러면, 전역으로 사용되는 user를 req.user로 바꾸고, 세션만 설정해주면 끝입니다.
 
+_cf)middleware.js 의 정체_
+
+로컬 변수를 전역 변수로 쓰고 싶을 때, 여기서 변수를 선언하고, app.js에서 import 하게 됩니다. 예로, 사용자가 로그인 되었는지, 안 되었는지에 따라서 header.pug에서 다른 UI를 보여주려고 할 때, middleware.js에서 passport가 생성해주는 req.user를 가지고, localMiddleware 라는 변수 안에 변수를 선언하면 header.pug에서 사용할 수 있게 됩니다.
+
 **middleware.js**
 
 ````javascript
@@ -1638,6 +1642,11 @@ import {
 } from "../controllers/userController";
 
 globalRouter.get(routes.gitHub, githubLogin);
+globalRouter.get(
+  routes.githubCallback,
+  passport.authenticate("github", { failureRedirect: "/login" }),
+  postGithubLogIn
+);
 ```
 
 **_userController.js_**
@@ -1701,7 +1710,7 @@ globalRouter.get(
 
 저희가 원하는 정보들은 profile의 \_json객체에 담겨 있습니다. cb 함수는 passport가 제공하는 callback 함수로, **user** 를 인자로 받아서 인증을 해주게 됩니다. 이 때, cb 함수의 인자로 user객체 없이 \*_에러만_ 넣어서 호출하면, 사용자를 찾지 못했을 경우의 함수가 실행됩니다.
 
-````javascript
+```javascript
 // export const githubLoginCallback = (accessToken, refreshToken, profile, cb) => {
 //   //SOMETHING
 // };
@@ -1751,4 +1760,4 @@ export const logout = (req, res) => {
   req.logout();
   res.redirect(routes.home);
 };
-````
+```

@@ -10,6 +10,7 @@ import {
   logout,
   githubLogin,
   postGithubLogIn,
+  getMe,
 } from "../controllers/userController"; // userController 에 있는 function들을 Router가 알고는 있어야 하니까 import
 import { onlyPublic, onlyPrivate } from "../middleware";
 
@@ -30,5 +31,7 @@ globalRouter.get(
   passport.authenticate("github", { failureRedirect: "/login" }),
   postGithubLogIn
 );
+
+globalRouter.get(routes.me, getMe);
 
 export default globalRouter;
